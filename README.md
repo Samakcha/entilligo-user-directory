@@ -46,3 +46,30 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/Samakcha/entilligo-user-directory.git
+cd entilligo-user-directory
+npm install
+npm run dev
+```
+
+Open http://localhost:3000 in your browser.
+
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── users/
+│   │   └── [id]/
+│   │       └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── not-found.tsx
+│   └── page.tsx
+└── components/
+    └── ui/
+```
+
+
+## AI Usage
+AI tools were used as part of the development workflow for brainstorming, debugging, and implementation assistance. The final implementation was reviewed and tested manually, including the API flow, search functionality, routing, loading state, error state, responsive layout, linting, and production build.
