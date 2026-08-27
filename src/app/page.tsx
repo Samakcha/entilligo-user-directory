@@ -1,68 +1,261 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Search, Users, ArrowUpRight, RefreshCw } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Navbar } from "@/components/Navbar";
+
+type User = {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  phone: string;
+  website: string;
+  address: {
+    city: string;
+  };
+  company: {
+    name: string;
+  };
+};
 
 export default function Home() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadUsers = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users",
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to fetch users.");
+      }
+
+      const data: User[] = await response.json();
+      setUsers(data);
+    } catch {
+      setError("We couldn't load the directory. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unable to fetch users.");
+        }
+
+        return response.json() as Promise<User[]>;
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setUsers(data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("We couldn't load the directory. Please try again.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    const search = query.toLowerCase().trim();
+
+    if (!search) {
+      return users;
+    }
+
+    return users.filter((user) =>
+      [user.name, user.username, user.email, user.company.name, user.address.city]
+        .join(" ")
+        .toLowerCase()
+        .includes(search),
+    );
+  }, [query, users]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+    <div className="min-h-screen font-sans font-normal bg-[#f8fafc] text-slate-900 transition-colors duration-300 dark:bg-[#08123e] dark:text-slate-100">
+      <Navbar />
+
+      <main>
+        {/* Hero Section with Aurora Mesh & Dot Grid Pattern */}
+        <section className="relative overflow-hidden border-b border-slate-200/80 bg-gradient-to-b from-[#e8f1fd] via-[#f3f7fe] to-[#f8fafc] transition-colors duration-300 dark:border-[#1e40d4] dark:from-[#0b1854] dark:via-[#0e2172] dark:to-[#08123e]">
+          {/* Glowing Aurora Ambient Blobs */}
+          <div className="pointer-events-none absolute -left-20 -top-20 size-96 rounded-full bg-[#cbe2fe]/70 blur-3xl dark:bg-[#1837b5]/50" />
+          <div className="pointer-events-none absolute -right-20 -top-20 size-96 rounded-full bg-[#cbe2fe]/70 blur-3xl dark:bg-[#1e40d4]/50" />
+
+          {/* Dot Matrix Grid Layer */}
+          <div className="pointer-events-none absolute inset-0 bg-hero-dots opacity-80" />
+
+          <div className="relative mx-auto max-w-6xl px-6 py-16 sm:px-8">
+            <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h1 className="font-sans font-bold text-4xl tracking-tight text-[#09122c] dark:text-white sm:text-5xl">
+                  Find your people<span className="text-[#2563eb]">.</span>
+                </h1>
+                <p className="mt-4 max-w-xl font-sans font-normal text-base leading-7 text-slate-600 dark:text-slate-300">
+                  Browse the team directory, explore member details, and discover
+                  who is working across the organization.
+                </p>
+              </div>
+
+              {/* Directory Counter Card */}
+              <div className="flex items-center gap-4 rounded-2xl border border-slate-200/90 bg-white/90 px-6 py-4 shadow-sm backdrop-blur-md dark:border-[#1e40d4] dark:bg-[#0c1f70]/90">
+                <div className="flex size-12 items-center justify-center rounded-full bg-[#eff6ff] text-[#2563eb] dark:bg-[#1837b5] dark:text-[#cbe2fe]">
+                  <Users className="size-6" />
+                </div>
+                <div>
+                  <p className="font-sans font-bold text-3xl text-[#09122c] dark:text-white">
+                    {users.length}
+                  </p>
+                  <p className="font-sans font-normal text-xs text-slate-500 dark:text-slate-300">
+                    directory members
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 py-10 sm:px-8">
+          {/* Search Bar */}
+          <div className="relative mb-10 max-w-xl">
+            <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-400" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search by name, email, company, or city..."
+              className="h-12 rounded-2xl font-sans font-normal bg-white pl-11 border-slate-200/80 shadow-sm dark:bg-[#0c1f70] dark:border-[#1e40d4] dark:text-white dark:placeholder:text-slate-400"
+              aria-label="Search users"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          </div>
+
+          {loading && (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <Card key={index} className="rounded-2xl border-slate-200/80 bg-white p-2 dark:border-[#1e40d4] dark:bg-[#0c1f70]">
+                  <CardHeader>
+                    <Skeleton className="size-12 rounded-full dark:bg-[#1837b5]" />
+                    <Skeleton className="mt-4 h-5 w-36 dark:bg-[#1837b5]" />
+                    <Skeleton className="h-4 w-24 dark:bg-[#1837b5]" />
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Skeleton className="h-4 w-full dark:bg-[#1837b5]" />
+                    <Skeleton className="h-4 w-4/5 dark:bg-[#1837b5]" />
+                    <Skeleton className="mt-5 h-10 w-full dark:bg-[#1837b5]" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {!loading && error && (
+            <Card className="rounded-2xl border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/30">
+              <CardContent className="flex flex-col items-start gap-4 p-6">
+                <div>
+                  <h2 className="font-sans font-semibold text-red-950 dark:text-red-300">Something went wrong</h2>
+                  <p className="mt-1 font-sans font-normal text-sm text-red-700 dark:text-red-400">{error}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => void loadUsers()}
+                  className="inline-flex items-center gap-2 rounded-xl font-sans font-medium bg-red-950 px-4 py-2 text-sm text-white dark:bg-red-900 dark:hover:bg-red-800"
+                >
+                  <RefreshCw className="size-4" />
+                  Try again
+                </button>
+              </CardContent>
+            </Card>
+          )}
+
+          {!loading && !error && filteredUsers.length === 0 && (
+            <Card className="rounded-2xl border-slate-200/80 bg-white dark:border-[#1e40d4] dark:bg-[#0c1f70]">
+              <CardContent className="p-10 text-center">
+                <h2 className="font-sans font-semibold text-[#09122c] dark:text-white">No users found</h2>
+                <p className="mt-2 font-sans font-normal text-sm text-slate-500 dark:text-slate-300">
+                  Try searching with a different name, company, or city.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {!loading && !error && filteredUsers.length > 0 && (
+            <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredUsers.map((user) => (
+                <Card
+                  key={user.id}
+                  className="rounded-3xl border border-slate-200/80 bg-white p-3 sm:p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg dark:border-[#1e40d4] dark:bg-[#0c1f70] dark:hover:shadow-[#050b20]/70"
+                >
+                  <CardHeader className="p-2 sm:p-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex size-14 items-center justify-center rounded-full bg-[#050b20] font-sans font-semibold text-xl text-white dark:bg-[#cbe2fe] dark:text-[#10288c]">
+                        {user.name.charAt(0)}
+                      </div>
+                      <span className="rounded-full bg-[#eff6ff] px-3.5 py-1.5 font-sans font-semibold text-xs text-[#2563eb] dark:bg-[#1837b5] dark:text-[#cbe2fe]">
+                        {user.address.city}
+                      </span>
+                    </div>
+
+                    <CardTitle className="pt-5 font-sans font-bold text-2xl text-[#050b20] dark:text-white">
+                      {user.name}
+                    </CardTitle>
+                    <p className="font-sans font-medium text-base text-[#2563eb] dark:text-[#cbe2fe]">
+                      @{user.username}
+                    </p>
+                  </CardHeader>
+
+                  <CardContent className="p-2 sm:p-3 space-y-5">
+                    <div className="space-y-2 font-sans font-normal text-base text-slate-500 dark:text-slate-300">
+                      <p className="truncate">{user.email}</p>
+                      <p className="truncate">{user.company.name}</p>
+                    </div>
+
+                    <Link
+                      href={`/users/${user.id}`}
+                      className="mt-6 flex h-12 items-center justify-center gap-2.5 rounded-2xl font-sans font-medium bg-[#050b20] px-5 text-base text-white transition-all hover:bg-[#121c3b] dark:bg-[#cbe2fe] dark:text-[#10288c] dark:hover:bg-white shadow-sm"
+                    >
+                      View profile
+                      <ArrowUpRight className="size-5" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );
