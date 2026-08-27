@@ -1,14 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen font-sans font-normal bg-[#f8fafc] text-slate-900 transition-colors duration-300 dark:bg-[#08123e] dark:text-slate-100">
+    <div className="h-dvh flex flex-col overflow-hidden font-sans font-normal bg-[#f8fafc] text-slate-900 transition-colors duration-300 dark:bg-[#08123e] dark:text-slate-100">
       <Navbar />
 
-      <main className="flex min-h-[calc(100vh-65px)] items-center justify-center px-6">
-        <div className="max-w-md text-center">
+      <main className="flex-1 flex items-center justify-center px-6 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+          className="max-w-md text-center"
+        >
           <span className="inline-flex items-center rounded-full bg-[#eff6ff] px-3.5 py-1 font-sans font-semibold text-xs text-[#2563eb] dark:bg-[#1837b5] dark:text-[#cbe2fe]">
             Error 404
           </span>
@@ -28,7 +36,7 @@ export default function NotFound() {
             <ArrowLeft className="size-4" />
             Back to directory
           </Link>
-        </div>
+        </motion.div>
       </main>
     </div>
   );
