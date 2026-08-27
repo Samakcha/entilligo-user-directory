@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Users, ArrowUpRight, RefreshCw } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,

@@ -9,17 +9,19 @@ export function ThemeToggle() {
   const [isIlluminating, setIsIlluminating] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const shouldBeDark = saved === "dark" || (!saved && prefersDark);
-    if (shouldBeDark) {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    } else {
-      document.documentElement.classList.remove("dark");
-      setIsDark(false);
-    }
+    queueMicrotask(() => {
+      setMounted(true);
+      const saved = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const shouldBeDark = saved === "dark" || (!saved && prefersDark);
+      if (shouldBeDark) {
+        document.documentElement.classList.add("dark");
+        setIsDark(true);
+      } else {
+        document.documentElement.classList.remove("dark");
+        setIsDark(false);
+      }
+    });
   }, []);
 
   const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
