@@ -12,8 +12,7 @@ export function ThemeToggle() {
     queueMicrotask(() => {
       setMounted(true);
       const saved = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const shouldBeDark = saved === "dark" || (!saved && prefersDark);
+      const shouldBeDark = saved === "dark";
       if (shouldBeDark) {
         document.documentElement.classList.add("dark");
         setIsDark(true);
